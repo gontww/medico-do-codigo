@@ -31,7 +31,7 @@ O GitHub tem um VS Code que roda direto no navegador. Precisa só estar logado n
 5. Como vocês não têm permissão de escrita aqui, o editor vai oferecer **criar um fork**. Aceitem: o commit vai para o fork de vocês.
 6. Voltem ao fork no GitHub e cliquem em **Contribute → Open pull request**.
 
-> ⚠️ O github.dev **não tem terminal**, então não dá para rodar `npm test` nele. Para rodar os testes, usem a opção 2.
+> ⚠️ O github.dev **não tem terminal**, então não dá para rodar `npm test` nele. Mas não tem problema: ao abrir o Pull Request, o GitHub roda os testes sozinho e mostra ✅ ou ❌ no PR. Se quiserem rodar antes, usem a opção 2.
 
 ### Opção 2: Codespaces (editor + terminal para rodar os testes)
 
