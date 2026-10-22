@@ -12,39 +12,26 @@ Quiz rápido para identificar os smells, em grupo: **https://www.gont.com.br/qui
 
 ## Como participar
 
-Não precisa instalar nada nem criar conta. Tudo roda no navegador.
+Não precisa instalar nada nem criar conta.
 
 1. **Peguem uma issue** na aba *Issues* e avisem o facilitador qual o grupo pegou, para ninguém repetir.
-2. **Abram o projeto no StackBlitz** (veja abaixo).
-3. **Rodem os testes antes de mexer em qualquer coisa** com `npm test`.
-4. **Refatorem em passos pequenos**, rodando `npm test` a cada passo.
-5. **Apresentem para a turma** direto da tela do StackBlitz.
+2. **Abram o arquivo da issue** na pasta [`src/loja`](src/loja) aqui no GitHub e leiam o código com calma.
+3. **Diagnostiquem:** quais smells vocês encontram? Qual técnica de refatoração resolve cada um?
+4. **Refatorem** o trecho, no papel, no editor ou na IDE que preferirem.
+5. **Apresentem para a turma** o antes e o depois.
 
-## Editando pelo navegador com o StackBlitz
+### Abrindo no computador (opcional)
 
-O StackBlitz é um VS Code que roda no navegador, com terminal e Node.js já prontos. **Não precisa de login.**
+Usem **Code → Download ZIP** nesta página e abram a pasta no IntelliJ, Eclipse ou VS Code. O código é Java 17 puro, sem dependências. Para compilar pelo terminal:
 
-[![Abrir no StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gontww/medico-do-codigo)
-
-1. Cliquem no botão acima ou abram **https://stackblitz.com/github/gontww/medico-do-codigo**.
-2. Esperem alguns segundos enquanto o projeto carrega.
-3. Os arquivos ficam na barra lateral esquerda, em `src/`. Abram o arquivo da issue de vocês e editem normalmente.
-4. No **terminal** na parte de baixo da tela, rodem:
-   ```bash
-   npm test
-   ```
-   Os testes devem continuar passando a cada passo da refatoração.
-
-> ⚠️ **Não fechem nem recarreguem a aba.** Sem login, o trabalho fica só nela. Para guardar uma cópia, usem o menu do projeto e baixem em ZIP (**Download project**).
-
-### Opcional: enviar como Pull Request
-
-Quem quiser deixar a solução registrada pode fazer depois, com a própria conta do GitHub: fork, commit e Pull Request usando o template. O GitHub roda os testes sozinho e mostra ✅ ou ❌ no PR.
+```bash
+javac -d out src/loja/*.java
+```
 
 ## Regras do jogo
 
-- 🟢 Os testes são a rede de segurança: **eles devem continuar passando**. Se precisarem alterar um teste, justifiquem na apresentação.
 - 🕵️ Cada issue descreve **um** smell. Mas cada arquivo esconde **pelo menos mais um**, que não foi especificado. Encontrem!
+- 🔒 Refatorar não muda o comportamento: o código deve continuar fazendo exatamente a mesma coisa.
 - 🚫 Não misturem feature nova com refatoração.
 - 🧹 Regra do escoteiro: deixem o código melhor do que encontraram.
 
@@ -52,9 +39,11 @@ Quem quiser deixar a solução registrada pode fazer depois, com a própria cont
 
 | Arquivo | Issue |
 |---|---|
-| `src/fatura.js` | Método longo |
-| `src/pagamento.js` | Aninhamento profundo |
-| `src/desconto.js` + `src/cliente.js` | Números mágicos |
-| `src/frete.js` | Switch repetido |
-| `src/LojaManager.js` | Classe Deus |
-| `src/relatorios.js` | Código duplicado |
+| `src/loja/Fatura.java` | Método longo |
+| `src/loja/Pagamento.java` | Aninhamento profundo |
+| `src/loja/Desconto.java` + `src/loja/Cliente.java` | Números mágicos |
+| `src/loja/Frete.java` | Switch repetido |
+| `src/loja/LojaManager.java` | Classe Deus |
+| `src/loja/Relatorios.java` | Código duplicado |
+
+As demais classes (`Pedido`, `Item`, `Cupom`, `Usuario`, `Compra`, `RegistroVenda`...) são só os dados usados pelos arquivos acima.

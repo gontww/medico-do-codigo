@@ -241,39 +241,44 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
 
 <!-- ======= trechos de código (texto puro) ======= -->
 <script type="text/plain" id="c1">
-function processarPagamento(usuario, valor, metodo) {
-  if (usuario) {
-    if (usuario.ativo) {
+public ResultadoPagamento processarPagamento(Usuario usuario, double valor, String metodo) {
+  if (usuario != null) {
+    if (usuario.isAtivo()) {
       if (valor > 0) {
-        if (METODOS.includes(metodo)) {
-          if (usuario.limite >= valor) {
-            usuario.limite -= valor;
-            return { status: "APROVADO" };
-          } else { throw new Error("Limite insuficiente"); }
-        } else { throw new Error("Metodo invalido"); }
-      } else { throw new Error("Valor invalido"); }
-    } else { throw new Error("Usuario inativo"); }
-  } else { throw new Error("Usuario nao existe"); }
+        if (METODOS.contains(metodo)) {
+          if (usuario.getLimite() >= valor) {
+            usuario.setLimite(usuario.getLimite() - valor);
+            return new ResultadoPagamento("APROVADO", valor, metodo);
+          } else { throw new IllegalStateException("Limite insuficiente"); }
+        } else { throw new IllegalArgumentException("Metodo invalido"); }
+      } else { throw new IllegalArgumentException("Valor invalido"); }
+    } else { throw new IllegalStateException("Usuario inativo"); }
+  } else { throw new IllegalArgumentException("Usuario nao existe"); }
 }
 </script>
 <script type="text/plain" id="c1d">
-function processarPagamento(usuario, valor, metodo) {
-  if (!usuario) throw new Error("Usuario nao existe");
-  if (!usuario.ativo) throw new Error("Usuario inativo");
-  if (valor <= 0) throw new Error("Valor invalido");
-  if (!METODOS.includes(metodo)) throw new Error("Metodo invalido");
-  if (usuario.limite < valor) throw new Error("Limite insuficiente");
+public ResultadoPagamento processarPagamento(Usuario usuario, double valor, String metodo) {
+  if (usuario == null)
+    throw new IllegalArgumentException("Usuario nao existe");
+  if (!usuario.isAtivo())
+    throw new IllegalStateException("Usuario inativo");
+  if (valor <= 0)
+    throw new IllegalArgumentException("Valor invalido");
+  if (!METODOS.contains(metodo))
+    throw new IllegalArgumentException("Metodo invalido");
+  if (usuario.getLimite() < valor)
+    throw new IllegalStateException("Limite insuficiente");
 
-  usuario.limite -= valor;
-  return { status: "APROVADO" };
+  usuario.setLimite(usuario.getLimite() - valor);
+  return new ResultadoPagamento("APROVADO", valor, metodo);
 }
 </script>
 <script type="text/plain" id="c3">
-function calcularDesconto(cliente, valorCompra) {
+public double calcularDesconto(Cliente cliente, double valorCompra) {
   if (ehVip(cliente)) {
     return valorCompra * 0.2;
   }
-  if (cliente.anosDeCadastro > 3) {
+  if (cliente.getAnosDeCadastro() > 3) {
     return valorCompra * 0.1;
   }
   if (valorCompra > 300) {
@@ -283,85 +288,96 @@ function calcularDesconto(cliente, valorCompra) {
 }
 </script>
 <script type="text/plain" id="c3d">
-const TAXA_DESCONTO_VIP = 0.2;
-const TAXA_DESCONTO_FIDELIDADE = 0.1;
-const ANOS_PARA_FIDELIDADE = 3;
-const VALOR_COMPRA_GRANDE = 300;
+private static final double TAXA_DESCONTO_VIP = 0.2;
+private static final double TAXA_DESCONTO_FIDELIDADE = 0.1;
+private static final int ANOS_PARA_FIDELIDADE = 3;
+private static final double VALOR_COMPRA_GRANDE = 300;
 
-function calcularDesconto(cliente, valorCompra) {
-  if (cliente.ehVip())
+public double calcularDesconto(Cliente cliente, double valorCompra) {
+  if (cliente.isVip())
     return valorCompra * TAXA_DESCONTO_VIP;
-  if (cliente.anosDeCadastro > ANOS_PARA_FIDELIDADE)
+  if (cliente.getAnosDeCadastro() > ANOS_PARA_FIDELIDADE)
     return valorCompra * TAXA_DESCONTO_FIDELIDADE;
   // ...
 }
 </script>
 <script type="text/plain" id="c5">
-function calcularFrete(tipo, peso) {
+public double calcularFrete(String tipo, double peso) {
   switch (tipo) {
     case "SEDEX": return peso * 1.5 + 10;
     case "PAC":   return peso * 0.8 + 5;
-    default: throw new Error("Tipo invalido");
+    default: throw new IllegalArgumentException("Tipo invalido");
   }
 }
-function prazoEntregaDias(tipo, km) {
+
+public int prazoEntregaDias(String tipo, double km) {
   switch (tipo) {
-    case "SEDEX": return 1 + Math.ceil(km / 1000);
-    case "PAC":   return 5 + Math.ceil(km / 500);
-    default: throw new Error("Tipo invalido");
+    case "SEDEX": return 1 + (int) Math.ceil(km / 1000);
+    case "PAC":   return 5 + (int) Math.ceil(km / 500);
+    default: throw new IllegalArgumentException("Tipo invalido");
   }
 }
-function descricaoFrete(tipo) {
+
+public String descricaoFrete(String tipo) {
   switch (tipo) { /* ...de novo os mesmos casos */ }
 }
 </script>
 <script type="text/plain" id="c5d">
-const estrategiasFrete = {
-  SEDEX: {
-    valor: (peso) => peso * 1.5 + 10,
-    prazo: (km) => 1 + Math.ceil(km / 1000),
-    descricao: "Sedex (expresso)",
+public enum TipoFrete {
+  SEDEX {
+    double valor(double peso) { return peso * 1.5 + 10; }
+    int prazo(double km) { return 1 + (int) Math.ceil(km / 1000); }
+    String descricao() { return "Sedex (expresso)"; }
   },
-  PAC: { ... },
-};
+  PAC { ... };
 
-function prazoEntregaDias(tipo, km) {
-  return estrategia(tipo).prazo(km);
+  abstract double valor(double peso);
+  abstract int prazo(double km);
+  abstract String descricao();
+}
+
+public int prazoEntregaDias(TipoFrete tipo, double km) {
+  return tipo.prazo(km);
 }
 </script>
 <script type="text/plain" id="c7">
-function relatorioPorCategoria(vendas, categoria) {
-  let total = 0;
-  for (const v of vendas) {
-    if (v.categoria === categoria && v.status !== "CANCELADA") {
-      total += v.preco * v.qtd;
+public String relatorioPorCategoria(List<RegistroVenda> vendas, String categoria) {
+  double total = 0;
+  for (RegistroVenda v : vendas) {
+    if (v.categoria().equals(categoria) && !v.status().equals("CANCELADA")) {
+      total += v.preco() * v.qtd();
     }
   }
-  return "TOTAL: R$ " + total.toFixed(2).replace(".", ",");
+  return "TOTAL: R$ " + String.format("%.2f", total);
 }
 
-function relatorioPorVendedor(vendas, vendedor) {
-  let total = 0;
-  for (const v of vendas) {
-    if (v.vendedor === vendedor && v.status !== "CANCELADA") {
-      total += v.preco * v.qtd;
+public String relatorioPorVendedor(List<RegistroVenda> vendas, String vendedor) {
+  double total = 0;
+  for (RegistroVenda v : vendas) {
+    if (v.vendedor().equals(vendedor) && !v.status().equals("CANCELADA")) {
+      total += v.preco() * v.qtd();
     }
   }
-  return "TOTAL: R$ " + total.toFixed(2).replace(".", ",");
+  return "TOTAL: R$ " + String.format("%.2f", total);
 }
 </script>
 <script type="text/plain" id="c7d">
-function relatorioVendas(vendas, criterio) {
-  const total = vendas
-    .filter((v) => criterio(v) && v.status !== "CANCELADA")
-    .reduce((soma, v) => soma + v.preco * v.qtd, 0);
+private String relatorioVendas(List<RegistroVenda> vendas,
+                               Predicate<RegistroVenda> criterio) {
+  double total = vendas.stream()
+      .filter(v -> criterio.test(v) && !v.status().equals("CANCELADA"))
+      .mapToDouble(v -> v.preco() * v.qtd())
+      .sum();
   return "TOTAL: " + formatarMoeda(total);
 }
 
-const relatorioPorCategoria = (vendas, categoria) =>
-  relatorioVendas(vendas, (v) => v.categoria === categoria);
-const relatorioPorVendedor = (vendas, vendedor) =>
-  relatorioVendas(vendas, (v) => v.vendedor === vendedor);
+public String relatorioPorCategoria(List<RegistroVenda> vendas, String categoria) {
+  return relatorioVendas(vendas, v -> v.categoria().equals(categoria));
+}
+
+public String relatorioPorVendedor(List<RegistroVenda> vendas, String vendedor) {
+  return relatorioVendas(vendas, v -> v.vendedor().equals(vendedor));
+}
 </script>
 
 <script>
@@ -385,14 +401,14 @@ const PERGUNTAS = [
     q: "Qual técnica resolve este smell?",
     opts: ["Cláusulas de guarda", "Strategy / Polimorfismo", "Renomear símbolos", "Extract Method"], right: 1,
     title: "Substituir switch por Strategy",
-    why: "O mesmo <code>switch (tipo)</code> se repete em 3 funções: um tipo novo obriga a mexer em todas (fere o Open/Closed). Com <b>Strategy</b>, cada tipo vira uma entrada.",
+    why: "O mesmo <code>switch (tipo)</code> se repete em 3 métodos: um tipo novo obriga a mexer em todos (fere o Open/Closed). Com <b>Strategy</b> (aqui, um <code>enum</code> em que cada tipo implementa seus métodos), cada tipo fica num lugar só.",
   },
   {
     issue: "ISSUE #6", code: "c7", after: "c7d",
     q: "Qual é o smell principal deste código?",
     opts: ["Aninhamento profundo", "Números mágicos", "Código duplicado", "Classe Deus"], right: 2,
     title: "Código duplicado",
-    why: "Funções quase idênticas: só o critério do filtro muda. Se o formato da moeda mudar, são 3 lugares para alterar. Solução: <b>Extract Method</b> com o filtro como <b>parâmetro</b>.",
+    why: "Métodos quase idênticos: só o critério do filtro muda. Se o formato da moeda mudar, são 3 lugares para alterar. Solução: <b>Extract Method</b> com o filtro como <b>parâmetro</b> (um <code>Predicate</code>).",
   },
 ];
 
@@ -409,7 +425,7 @@ function limpar() { try { localStorage.removeItem(KEY); } catch {} }
 // ---------- realce de sintaxe simples ----------
 function realcar(src) {
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*")|\b(\d+(?:\.\d+)?)\b|\b(function|return|if|else|const|let|for|of|throw|new|switch|case|default|class|constructor)\b/g;
+  const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*")|\b(\d+(?:\.\d+)?)\b|\b(public|private|protected|static|final|abstract|class|enum|record|interface|return|if|else|for|while|throw|new|switch|case|default|break|void|double|int|long|boolean|null|true|false)\b/g;
   let out = "", last = 0, m;
   while ((m = re.exec(src))) {
     out += esc(src.slice(last, m.index));

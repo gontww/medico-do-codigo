@@ -1,9 +1,0 @@
-{
-  "name": "medico-do-codigo",
-  "version": "1.0.0",
-  "description": "Dinâmica prática de refatoração: código legado cheio de code smells",
-  "scripts": {
-    "test": "node --test"
-  },
-  "license": "MIT"
-}

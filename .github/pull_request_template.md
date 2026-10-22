@@ -13,6 +13,6 @@ Closes #
 2.
 
 ## ✅ Checklist
-- [ ] `npm test` passando
+- [ ] O código compila
 - [ ] Nenhuma mudança de comportamento externo
 - [ ] Nenhuma feature nova misturada (exceto bônus em commit separado)
