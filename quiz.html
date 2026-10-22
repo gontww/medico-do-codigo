@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz Médico do Código</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f172a; --navy-2: #1e293b; --navy-3: #334155;
+  --text: #f1f5f9; --muted: #94a3b8; --blue: #3b82f6; --blue-soft: #93c5fd;
+  --a: #e11d48; --b: #2563eb; --c: #d97706; --d: #16a34a;
+  --ok: #22c55e; --bad: #fb7185;
+  --code: 'Fira Code', ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--navy); color: var(--text);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  overflow: hidden;
+}
+button { font: inherit; cursor: pointer; border: 0; }
+.screen { display: none; height: 100vh; padding: 2.2vh 3vw; flex-direction: column; }
+.screen.on { display: flex; }
+
+/* ---------- topo ---------- */
+.top { display: flex; align-items: center; gap: 16px; min-height: 7vh; }
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #172554; border: 1px solid #1e3a8a; color: var(--blue-soft);
+  font-weight: 700; font-size: clamp(12px, 1.5vh, 16px); padding: 6px 16px; border-radius: 999px;
+}
+.progress { color: var(--muted); font-weight: 700; font-size: clamp(12px, 1.6vh, 18px); }
+.spacer { flex: 1; }
+
+h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.02em; margin: 1.4vh 0 1.6vh; line-height: 1.2; }
+
+/* ---------- código ---------- */
+.code {
+  flex: 1; min-height: 0; background: #020617; border: 1px solid var(--navy-2); border-radius: 14px;
+  padding: 2vh 2vw; overflow: hidden; display: flex; align-items: center;
+}
+.code pre { font-family: var(--code); font-size: clamp(12px, 2.25vh, 26px); line-height: 1.45; white-space: pre; color: #e2e8f0; }
+.tk-c { color: #64748b; font-style: italic; }
+.tk-s { color: #86efac; }
+.tk-n { color: #fbbf24; font-weight: 500; }
+.tk-k { color: #c084fc; }
+
+/* ---------- alternativas ---------- */
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4vh 1.2vw; margin-top: 1.8vh; }
+.opt {
+  display: flex; align-items: center; gap: 1.2vw; min-height: 9vh; padding: 1vh 1.4vw;
+  border-radius: 12px; color: #fff; font-weight: 700; font-size: clamp(16px, 2.9vh, 32px);
+  transition: opacity .3s, transform .3s, outline-color .3s; outline: 4px solid transparent;
+}
+.opt .num {
+  flex: none; width: 1.7em; height: 1.7em; border-radius: 10px; display: grid; place-items: center;
+  background: rgba(0,0,0,.25); font-size: 1.15em; font-weight: 800;
+}
+.opt.o0 { background: var(--a); } .opt.o1 { background: var(--b); }
+.opt.o2 { background: var(--c); } .opt.o3 { background: var(--d); }
+.revealed .opt:not(.right) { opacity: .25; }
+.opts.revealed { gap: .9vh 1.2vw; margin-top: 1vh; }
+.revealed .opt { min-height: 5.6vh; padding: .5vh 1.2vw; font-size: clamp(14px, 2.3vh, 26px); }
+.revealed .opt.right { outline-color: #fff; transform: scale(1.02); }
+
+/* ---------- revelação ---------- */
+.reveal-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.6vw; margin-top: 1.2vh; }
+.answer {
+  background: var(--navy-2); border-radius: 14px; padding: 2.2vh 1.6vw; display: flex; flex-direction: column; gap: 1.4vh;
+}
+.answer .label { color: var(--ok); font-weight: 800; font-size: clamp(12px, 1.6vh, 18px); letter-spacing: .04em; }
+.answer .title { font-size: clamp(20px, 3.6vh, 40px); font-weight: 800; line-height: 1.15; }
+.answer .why { color: #cbd5e1; font-size: clamp(14px, 2.2vh, 24px); line-height: 1.45; }
+.after-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: .8vh; }
+.after-label { color: var(--ok); font-weight: 800; font-size: clamp(12px, 1.6vh, 18px); letter-spacing: .04em; }
+.after-wrap { display: flex; flex-direction: column; min-height: 0; }
+.after-wrap .code { border-color: #14532d; transition: border-color .2s; }
+.after-wrap.antes .after-label { color: var(--bad); }
+.after-wrap.antes .code { border-color: #7f1d1d; }
+
+/* switch Antes / Depois */
+.switch {
+  display: inline-flex; align-items: center; gap: 10px; background: none; color: var(--muted);
+  font-weight: 800; font-size: clamp(12px, 1.7vh, 18px); padding: 4px 2px; border-radius: 8px;
+}
+.switch .track { width: 2.8em; height: 1.5em; border-radius: 999px; background: #9f1239; position: relative; transition: background .2s; }
+.switch .knob {
+  position: absolute; top: .2em; left: .2em; width: 1.1em; height: 1.1em; border-radius: 50%;
+  background: #fff; transition: transform .2s;
+}
+.switch[aria-checked="true"] .track { background: #15803d; }
+.switch[aria-checked="true"] .knob { transform: translateX(1.3em); }
+.switch[aria-checked="false"] .lbl-antes, .switch[aria-checked="true"] .lbl-depois { color: var(--text); }
+.switch:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
+
+.teams-bar { margin-top: 1.6vh; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.teams-bar .hint { color: var(--muted); font-weight: 700; font-size: clamp(12px, 1.7vh, 18px); margin-right: 6px; }
+.chip {
+  background: var(--navy-2); color: var(--text); border: 2px solid var(--navy-3); border-radius: 999px;
+  padding: .7vh 1.2vw; font-weight: 700; font-size: clamp(13px, 2vh, 22px); display: inline-flex; gap: 10px; align-items: center;
+}
+.chip .pts { color: var(--muted); font-weight: 800; }
+.chip.hit { background: #14532d; border-color: var(--ok); }
+.chip.hit .pts { color: #bbf7d0; }
+.chip kbd { font-family: var(--code); font-size: .75em; color: var(--muted); }
+
+/* ---------- botões ---------- */
+.actions { display: flex; gap: 12px; align-items: center; margin-top: 1.6vh; }
+.btn {
+  background: var(--blue); color: #fff; font-weight: 800; border-radius: 12px;
+  padding: 1.3vh 2vw; font-size: clamp(14px, 2.1vh, 22px);
+}
+.btn.ghost { background: var(--navy-2); color: var(--text); }
+.btn:focus-visible, .chip:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
+.keys { color: #475569; font-size: clamp(11px, 1.4vh, 15px); }
+
+/* ---------- abertura ---------- */
+.center { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+.center h1 { font-size: clamp(32px, 7.5vh, 84px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin: 2.4vh 0 1.4vh; }
+.lead { color: var(--muted); font-size: clamp(16px, 2.6vh, 28px); line-height: 1.5; max-width: 900px; }
+.rules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 4vh 0; }
+.rule { background: var(--navy-2); border-radius: 12px; padding: 2vh 1.2vw; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: clamp(14px, 2.2vh, 24px); }
+.rule .sq { width: 4.6vh; height: 4.6vh; border-radius: 8px; display: grid; place-items: center; color: #fff; font-size: 1.1em; font-weight: 800; flex: none; }
+.setup { display: flex; gap: 2vw; align-items: flex-end; flex-wrap: wrap; }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field span { color: var(--muted); font-weight: 700; font-size: clamp(12px, 1.6vh, 16px); }
+.field input, .field select {
+  background: var(--navy-2); color: var(--text); border: 2px solid var(--navy-3); border-radius: 10px;
+  padding: 1vh 1vw; font: inherit; font-weight: 700; font-size: clamp(14px, 2.2vh, 22px);
+}
+.field input[type=number] { width: 7em; }
+.scoring { color: var(--muted); margin-top: 2.4vh; font-size: clamp(13px, 1.9vh, 20px); }
+.scoring b { color: var(--text); }
+
+/* ---------- placar ---------- */
+.board { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 1100px; width: 100%; margin: 0 auto; gap: 1.4vh; }
+.board h1 { font-size: clamp(30px, 6vh, 64px); font-weight: 800; text-align: center; margin-bottom: 2vh; }
+.row { display: grid; grid-template-columns: 4em 12em 1fr 4em; align-items: center; gap: 1.2vw; font-weight: 800; font-size: clamp(16px, 2.8vh, 30px); }
+.row .pos { color: var(--muted); text-align: right; }
+.row .bar { height: 4.6vh; border-radius: 8px; background: var(--blue); width: 0; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+.row.p1 .bar { background: #eab308; } .row.p2 .bar { background: #94a3b8; } .row.p3 .bar { background: #b45309; }
+.row .val { text-align: right; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+.confetti i { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 2px; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+@media (max-width: 760px) {
+  body { overflow: auto; }
+  .screen { height: auto; min-height: 100vh; padding: 16px; }
+  .opts, .reveal-grid, .rules { grid-template-columns: 1fr; }
+  .code pre { font-size: 12px; }
+  .row { grid-template-columns: 2em 7em 1fr 3em; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======= abertura ======= -->
+<section class="screen on" id="s-intro">
+  <div class="center">
+    <div><span class="pill">&lt;/&gt; DIAGNÓSTICO RELÂMPAGO</span></div>
+    <h1>O Médico do Código</h1>
+    <p class="lead">Vejam o código, diagnostiquem e respondam levantando os dedos. Vale a primeira resposta que o grupo mostrar!</p>
+    <div class="rules">
+      <div class="rule"><span class="sq" style="background:var(--a)">1</span>1 dedo</div>
+      <div class="rule"><span class="sq" style="background:var(--b)">2</span>2 dedos</div>
+      <div class="rule"><span class="sq" style="background:var(--c)">3</span>3 dedos</div>
+      <div class="rule"><span class="sq" style="background:var(--d)">4</span>4 dedos</div>
+    </div>
+    <div class="setup">
+      <label class="field"><span>Quantas duplas/grupos?</span><input id="n-teams" type="number" min="1" max="20" value="6"></label>
+      <button class="btn" id="b-start">Começar ▶</button>
+      <button class="btn ghost" id="b-resume" hidden>Continuar partida salva</button>
+    </div>
+    <p class="scoring">Cada acerto vale <b>+1</b> · 4 perguntas</p>
+  </div>
+</section>
+
+<!-- ======= pergunta ======= -->
+<section class="screen" id="s-q">
+  <div class="top">
+    <span class="pill" id="q-pill">ISSUE</span>
+    <span class="progress" id="q-prog"></span>
+  </div>
+  <h1 class="q" id="q-text"></h1>
+  <div class="code"><pre id="q-code"></pre></div>
+  <div class="opts" id="q-opts"></div>
+  <div class="actions">
+    <button class="btn" id="b-reveal">Revelar resposta</button>
+    <span class="spacer"></span>
+    <span class="keys">Espaço revela</span>
+  </div>
+</section>
+
+<!-- ======= revelação ======= -->
+<section class="screen" id="s-r">
+  <div class="top">
+    <span class="pill" id="r-pill">ISSUE</span>
+    <span class="progress" id="r-prog"></span>
+  </div>
+  <div class="opts revealed" id="r-opts"></div>
+  <div class="reveal-grid">
+    <div class="answer">
+      <div class="label">✓ DIAGNÓSTICO</div>
+      <div class="title" id="r-title"></div>
+      <div class="why" id="r-why"></div>
+    </div>
+    <div class="after-wrap" id="r-wrap">
+      <div class="after-head">
+        <div class="after-label" id="r-label">✓ DEPOIS DA REFATORAÇÃO</div>
+        <button class="switch" id="b-toggle" role="switch" aria-checked="true" aria-label="Mostrar o código depois da refatoração">
+          <span class="lbl-antes">Antes</span><span class="track"><span class="knob"></span></span><span class="lbl-depois">Depois</span>
+        </button>
+      </div>
+      <div class="code"><pre id="r-code"></pre></div>
+    </div>
+  </div>
+  <div class="teams-bar" id="r-teams"><span class="hint">Quem acertou? (+1)</span></div>
+  <div class="actions">
+    <button class="btn ghost" id="b-back">◀ Voltar</button>
+    <span class="spacer"></span>
+    <span class="keys">Teclas 1–9 marcam grupos · A alterna antes/depois · Espaço avança</span>
+    <button class="btn" id="b-next">Próxima ▶</button>
+  </div>
+</section>
+
+<!-- ======= placar ======= -->
+<section class="screen" id="s-end">
+  <div class="board" id="board"><h1>🏆 Placar final</h1></div>
+  <div class="actions">
+    <button class="btn ghost" id="b-review">◀ Voltar à última pergunta</button>
+    <span class="spacer"></span>
+    <button class="btn ghost" id="b-reset">Nova partida</button>
+  </div>
+</section>
+
+<div class="confetti" id="confetti"></div>
+
+<!-- ======= trechos de código (texto puro) ======= -->
+<script type="text/plain" id="c1">
+function processarPagamento(usuario, valor, metodo) {
+  if (usuario) {
+    if (usuario.ativo) {
+      if (valor > 0) {
+        if (METODOS.includes(metodo)) {
+          if (usuario.limite >= valor) {
+            usuario.limite -= valor;
+            return { status: "APROVADO" };
+          } else { throw new Error("Limite insuficiente"); }
+        } else { throw new Error("Metodo invalido"); }
+      } else { throw new Error("Valor invalido"); }
+    } else { throw new Error("Usuario inativo"); }
+  } else { throw new Error("Usuario nao existe"); }
+}
+</script>
+<script type="text/plain" id="c1d">
+function processarPagamento(usuario, valor, metodo) {
+  if (!usuario) throw new Error("Usuario nao existe");
+  if (!usuario.ativo) throw new Error("Usuario inativo");
+  if (valor <= 0) throw new Error("Valor invalido");
+  if (!METODOS.includes(metodo)) throw new Error("Metodo invalido");
+  if (usuario.limite < valor) throw new Error("Limite insuficiente");
+
+  usuario.limite -= valor;
+  return { status: "APROVADO" };
+}
+</script>
+<script type="text/plain" id="c3">
+function calcularDesconto(cliente, valorCompra) {
+  if (ehVip(cliente)) {
+    return valorCompra * 0.2;
+  }
+  if (cliente.anosDeCadastro > 3) {
+    return valorCompra * 0.1;
+  }
+  if (valorCompra > 300) {
+    return valorCompra * 0.05;
+  }
+  return 0;
+}
+</script>
+<script type="text/plain" id="c3d">
+const TAXA_DESCONTO_VIP = 0.2;
+const TAXA_DESCONTO_FIDELIDADE = 0.1;
+const ANOS_PARA_FIDELIDADE = 3;
+const VALOR_COMPRA_GRANDE = 300;
+
+function calcularDesconto(cliente, valorCompra) {
+  if (cliente.ehVip())
+    return valorCompra * TAXA_DESCONTO_VIP;
+  if (cliente.anosDeCadastro > ANOS_PARA_FIDELIDADE)
+    return valorCompra * TAXA_DESCONTO_FIDELIDADE;
+  // ...
+}
+</script>
+<script type="text/plain" id="c5">
+function calcularFrete(tipo, peso) {
+  switch (tipo) {
+    case "SEDEX": return peso * 1.5 + 10;
+    case "PAC":   return peso * 0.8 + 5;
+    default: throw new Error("Tipo invalido");
+  }
+}
+function prazoEntregaDias(tipo, km) {
+  switch (tipo) {
+    case "SEDEX": return 1 + Math.ceil(km / 1000);
+    case "PAC":   return 5 + Math.ceil(km / 500);
+    default: throw new Error("Tipo invalido");
+  }
+}
+function descricaoFrete(tipo) {
+  switch (tipo) { /* ...de novo os mesmos casos */ }
+}
+</script>
+<script type="text/plain" id="c5d">
+const estrategiasFrete = {
+  SEDEX: {
+    valor: (peso) => peso * 1.5 + 10,
+    prazo: (km) => 1 + Math.ceil(km / 1000),
+    descricao: "Sedex (expresso)",
+  },
+  PAC: { ... },
+};
+
+function prazoEntregaDias(tipo, km) {
+  return estrategia(tipo).prazo(km);
+}
+</script>
+<script type="text/plain" id="c7">
+function relatorioPorCategoria(vendas, categoria) {
+  let total = 0;
+  for (const v of vendas) {
+    if (v.categoria === categoria && v.status !== "CANCELADA") {
+      total += v.preco * v.qtd;
+    }
+  }
+  return "TOTAL: R$ " + total.toFixed(2).replace(".", ",");
+}
+
+function relatorioPorVendedor(vendas, vendedor) {
+  let total = 0;
+  for (const v of vendas) {
+    if (v.vendedor === vendedor && v.status !== "CANCELADA") {
+      total += v.preco * v.qtd;
+    }
+  }
+  return "TOTAL: R$ " + total.toFixed(2).replace(".", ",");
+}
+</script>
+<script type="text/plain" id="c7d">
+function relatorioVendas(vendas, criterio) {
+  const total = vendas
+    .filter((v) => criterio(v) && v.status !== "CANCELADA")
+    .reduce((soma, v) => soma + v.preco * v.qtd, 0);
+  return "TOTAL: " + formatarMoeda(total);
+}
+
+const relatorioPorCategoria = (vendas, categoria) =>
+  relatorioVendas(vendas, (v) => v.categoria === categoria);
+const relatorioPorVendedor = (vendas, vendedor) =>
+  relatorioVendas(vendas, (v) => v.vendedor === vendedor);
+</script>
+
+<script>
+const PERGUNTAS = [
+  {
+    issue: "ISSUE #2", code: "c1", after: "c1d",
+    q: "Qual é o smell principal deste código?",
+    opts: ["Classe Deus", "Aninhamento profundo", "Números mágicos", "Feature Envy"], right: 1,
+    title: "Aninhamento profundo (arrow anti-pattern)",
+    why: "5 níveis de <code>if</code>. O caminho feliz fica escondido no meio. A técnica é usar <b>cláusulas de guarda</b>: inverter as condições e sair cedo.",
+  },
+  {
+    issue: "ISSUE #3", code: "c3", after: "c3d",
+    q: "Qual é o smell principal deste código?",
+    opts: ["Números mágicos", "Método longo", "Código morto", "Aninhamento profundo"], right: 0,
+    title: "Números mágicos",
+    why: "O que significam 0.2, 3 e 300? A regra de negócio está escondida em literais. Solução: <b>constantes com nome</b> que explicam a regra.",
+  },
+  {
+    issue: "ISSUE #4", code: "c5", after: "c5d",
+    q: "Qual técnica resolve este smell?",
+    opts: ["Cláusulas de guarda", "Strategy / Polimorfismo", "Renomear símbolos", "Extract Method"], right: 1,
+    title: "Substituir switch por Strategy",
+    why: "O mesmo <code>switch (tipo)</code> se repete em 3 funções: um tipo novo obriga a mexer em todas (fere o Open/Closed). Com <b>Strategy</b>, cada tipo vira uma entrada.",
+  },
+  {
+    issue: "ISSUE #6", code: "c7", after: "c7d",
+    q: "Qual é o smell principal deste código?",
+    opts: ["Aninhamento profundo", "Números mágicos", "Código duplicado", "Classe Deus"], right: 2,
+    title: "Código duplicado",
+    why: "Funções quase idênticas: só o critério do filtro muda. Se o formato da moeda mudar, são 3 lugares para alterar. Solução: <b>Extract Method</b> com o filtro como <b>parâmetro</b>.",
+  },
+];
+
+const KEY = "quiz-medico-do-codigo";
+const $ = (id) => document.getElementById(id);
+
+let estado = null; // { times: [nome], i, acertos: {[pergunta]: [idxTimes]} }
+
+// ---------- persistência leve (sobrevive a um F5 sem querer) ----------
+function salvar() { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch {} }
+function carregar() { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } }
+function limpar() { try { localStorage.removeItem(KEY); } catch {} }
+
+// ---------- realce de sintaxe simples ----------
+function realcar(src) {
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*")|\b(\d+(?:\.\d+)?)\b|\b(function|return|if|else|const|let|for|of|throw|new|switch|case|default|class|constructor)\b/g;
+  let out = "", last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    const cls = m[1] ? "c" : m[2] ? "s" : m[3] ? "n" : "k";
+    out += `<span class="tk-${cls}">${esc(m[0])}</span>`;
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+const trecho = (id) => realcar($(id).textContent.replace(/^\n+|\s+$/g, ""));
+
+// ---------- telas ----------
+function mostrar(id) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
+  document.querySelectorAll(`#${id} .code pre`).forEach(caber);
+}
+
+// reduz a fonte do código até caber na caixa (trechos longos em telas baixas)
+function caber(pre) {
+  pre.style.fontSize = "";
+  const caixa = pre.parentElement;
+  const estilo = getComputedStyle(caixa);
+  const altura = caixa.clientHeight - parseFloat(estilo.paddingTop) - parseFloat(estilo.paddingBottom);
+  const largura = caixa.clientWidth - parseFloat(estilo.paddingLeft) - parseFloat(estilo.paddingRight);
+  let tamanho = parseFloat(getComputedStyle(pre).fontSize);
+  while (tamanho > 10 && (pre.scrollHeight > altura || pre.scrollWidth > largura)) {
+    tamanho -= 0.5;
+    pre.style.fontSize = tamanho + "px";
+  }
+}
+addEventListener("resize", () => document.querySelectorAll(".screen.on .code pre").forEach(caber));
+
+function opcoesHTML(p) {
+  return p.opts.map((t, k) => `
+    <div class="opt o${k}${k === p.right ? " right" : ""}">
+      <span class="num">${k + 1}</span><span>${t}</span>
+    </div>`).join("");
+}
+
+function cabecalho(p, pillId, progId) {
+  const pill = $(pillId);
+  pill.textContent = p.issue;
+  $(progId).textContent = `Pergunta ${estado.i + 1} de ${PERGUNTAS.length}`;
+}
+
+function abrirPergunta() {
+  const p = PERGUNTAS[estado.i];
+  cabecalho(p, "q-pill", "q-prog");
+  $("q-text").textContent = p.q;
+  $("q-code").innerHTML = trecho(p.code);
+  $("q-opts").innerHTML = opcoesHTML(p);
+  mostrar("s-q");
+}
+
+function revelar() {
+  const p = PERGUNTAS[estado.i];
+  cabecalho(p, "r-pill", "r-prog");
+  $("r-opts").innerHTML = opcoesHTML(p);
+  $("r-title").textContent = p.title;
+  $("r-why").innerHTML = p.why;
+  verAntes = false;
+  desenharCodigoRevelado();
+  desenharTimes();
+  mostrar("s-r");
+}
+
+// switch Antes / Depois no painel de código da revelação
+let verAntes = false;
+function desenharCodigoRevelado() {
+  const p = PERGUNTAS[estado.i];
+  const pre = $("r-code");
+  pre.innerHTML = trecho(verAntes ? p.code : p.after);
+  $("r-label").textContent = verAntes ? "✗ ANTES DA REFATORAÇÃO" : "✓ DEPOIS DA REFATORAÇÃO";
+  $("r-wrap").classList.toggle("antes", verAntes);
+  $("b-toggle").setAttribute("aria-checked", String(!verAntes));
+  if ($("s-r").classList.contains("on")) caber(pre);
+}
+function alternarAntesDepois() {
+  verAntes = !verAntes;
+  desenharCodigoRevelado();
+}
+
+function totalDoTime(t) {
+  return Object.values(estado.acertos).filter((lista) => lista.includes(t)).length;
+}
+
+function desenharTimes() {
+  const bar = $("r-teams");
+  bar.querySelectorAll(".chip").forEach((c) => c.remove());
+  const marcados = estado.acertos[estado.i] || [];
+  estado.times.forEach((nome, t) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (marcados.includes(t) ? " hit" : "");
+    b.innerHTML = `${t < 9 ? `<kbd>${t + 1}</kbd>` : ""}<span></span><span class="pts">${totalDoTime(t)}</span>`;
+    b.querySelector("span").textContent = nome;
+    b.onclick = () => alternarTime(t);
+    bar.appendChild(b);
+  });
+}
+
+function alternarTime(t) {
+  const lista = estado.acertos[estado.i] || (estado.acertos[estado.i] = []);
+  const k = lista.indexOf(t);
+  k >= 0 ? lista.splice(k, 1) : lista.push(t);
+  salvar();
+  desenharTimes();
+}
+
+function proxima() {
+  if (estado.i < PERGUNTAS.length - 1) {
+    estado.i += 1;
+    salvar();
+    abrirPergunta();
+  } else {
+    placar();
+  }
+}
+
+function placar() {
+  const board = $("board");
+  board.querySelectorAll(".row").forEach((r) => r.remove());
+  const linhas = estado.times
+    .map((nome, t) => ({ nome, pts: totalDoTime(t) }))
+    .sort((a, b) => b.pts - a.pts);
+  const max = Math.max(1, ...linhas.map((l) => l.pts));
+  linhas.forEach((l, k) => {
+    const pos = k === 0 || l.pts !== linhas[k - 1].pts ? k + 1 : null;
+    const row = document.createElement("div");
+    row.className = "row" + (l.pts === linhas[0].pts && l.pts > 0 ? " p1" : "");
+    row.innerHTML = `<span class="pos">${pos ? pos + "º" : ""}</span><span class="nm"></span><div class="bar"></div><span class="val">${l.pts}</span>`;
+    row.querySelector(".nm").textContent = l.nome;
+    board.appendChild(row);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      row.querySelector(".bar").style.width = `${(l.pts / max) * 100}%`;
+    }));
+  });
+  mostrar("s-end");
+  confete();
+}
+
+function confete() {
+  const box = $("confetti");
+  box.innerHTML = "";
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cores = ["#e11d48", "#2563eb", "#d97706", "#16a34a", "#eab308", "#93c5fd"];
+  for (let k = 0; k < 120; k++) {
+    const c = document.createElement("i");
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = cores[k % cores.length];
+    c.style.animationDuration = 2.5 + Math.random() * 2.5 + "s";
+    c.style.animationDelay = Math.random() * 1.2 + "s";
+    box.appendChild(c);
+  }
+  setTimeout(() => (box.innerHTML = ""), 6500);
+}
+
+// ---------- início ----------
+function comecar() {
+  const n = Math.min(20, Math.max(1, parseInt($("n-teams").value, 10) || 6));
+  estado = {
+    times: Array.from({ length: n }, (_, k) => `Grupo ${k + 1}`),
+    i: 0,
+    acertos: {},
+  };
+  salvar();
+  abrirPergunta();
+}
+
+$("b-start").onclick = comecar;
+$("b-resume").onclick = () => { estado = carregar(); abrirPergunta(); };
+$("b-reveal").onclick = revelar;
+$("b-next").onclick = proxima;
+$("b-toggle").onclick = (e) => {
+  alternarAntesDepois();
+  // depois de um clique de mouse, solta o foco para o Espaço voltar a avançar
+  if (e.detail > 0) e.currentTarget.blur();
+};
+$("b-back").onclick = () => abrirPergunta();
+$("b-review").onclick = () => { $("confetti").innerHTML = ""; revelar(); };
+$("b-reset").onclick = () => { limpar(); estado = null; $("b-resume").hidden = true; mostrar("s-intro"); };
+
+const salvo = carregar();
+if (salvo && Array.isArray(salvo.times) && salvo.i < PERGUNTAS.length) $("b-resume").hidden = false;
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  const tela = document.querySelector(".screen.on").id;
+  if (tela === "s-q") {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); revelar(); }
+  } else if (tela === "s-r") {
+    if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") { e.preventDefault(); proxima(); }
+    if (/^[1-9]$/.test(e.key) && +e.key <= estado.times.length) alternarTime(+e.key - 1);
+    if (e.key.toLowerCase() === "a") alternarAntesDepois();
+  }
+});
+</script>
+</body>
+</html>
