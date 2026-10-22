@@ -96,16 +96,6 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
 .switch[aria-checked="false"] .lbl-antes, .switch[aria-checked="true"] .lbl-depois { color: var(--text); }
 .switch:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
 
-.teams-bar { margin-top: 1.6vh; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.teams-bar .hint { color: var(--muted); font-weight: 700; font-size: clamp(12px, 1.7vh, 18px); margin-right: 6px; }
-.chip {
-  background: var(--navy-2); color: var(--text); border: 2px solid var(--navy-3); border-radius: 999px;
-  padding: .7vh 1.2vw; font-weight: 700; font-size: clamp(13px, 2vh, 22px); display: inline-flex; gap: 10px; align-items: center;
-}
-.chip .pts { color: var(--muted); font-weight: 800; }
-.chip.hit { background: #14532d; border-color: var(--ok); }
-.chip.hit .pts { color: #bbf7d0; }
-.chip kbd { font-family: var(--code); font-size: .75em; color: var(--muted); }
 
 /* ---------- botões ---------- */
 .actions { display: flex; gap: 12px; align-items: center; margin-top: 1.6vh; }
@@ -114,7 +104,7 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
   padding: 1.3vh 2vw; font-size: clamp(14px, 2.1vh, 22px);
 }
 .btn.ghost { background: var(--navy-2); color: var(--text); }
-.btn:focus-visible, .chip:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
+.btn:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 2px; }
 .keys { color: #475569; font-size: clamp(11px, 1.4vh, 15px); }
 
 /* ---------- abertura ---------- */
@@ -124,25 +114,16 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
 .rules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 4vh 0; }
 .rule { background: var(--navy-2); border-radius: 12px; padding: 2vh 1.2vw; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: clamp(14px, 2.2vh, 24px); }
 .rule .sq { width: 4.6vh; height: 4.6vh; border-radius: 8px; display: grid; place-items: center; color: #fff; font-size: 1.1em; font-weight: 800; flex: none; }
-.setup { display: flex; gap: 2vw; align-items: flex-end; flex-wrap: wrap; }
-.field { display: flex; flex-direction: column; gap: 8px; }
-.field span { color: var(--muted); font-weight: 700; font-size: clamp(12px, 1.6vh, 16px); }
-.field input, .field select {
-  background: var(--navy-2); color: var(--text); border: 2px solid var(--navy-3); border-radius: 10px;
-  padding: 1vh 1vw; font: inherit; font-weight: 700; font-size: clamp(14px, 2.2vh, 22px);
-}
-.field input[type=number] { width: 7em; }
-.scoring { color: var(--muted); margin-top: 2.4vh; font-size: clamp(13px, 1.9vh, 20px); }
-.scoring b { color: var(--text); }
 
-/* ---------- placar ---------- */
+/* ---------- resumo final ---------- */
 .board { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 1100px; width: 100%; margin: 0 auto; gap: 1.4vh; }
-.board h1 { font-size: clamp(30px, 6vh, 64px); font-weight: 800; text-align: center; margin-bottom: 2vh; }
-.row { display: grid; grid-template-columns: 4em 12em 1fr 4em; align-items: center; gap: 1.2vw; font-weight: 800; font-size: clamp(16px, 2.8vh, 30px); }
-.row .pos { color: var(--muted); text-align: right; }
-.row .bar { height: 4.6vh; border-radius: 8px; background: var(--blue); width: 0; transition: width 1s cubic-bezier(.2,.8,.2,1); }
-.row.p1 .bar { background: #eab308; } .row.p2 .bar { background: #94a3b8; } .row.p3 .bar { background: #b45309; }
-.row .val { text-align: right; }
+.board h1 { font-size: clamp(30px, 6vh, 64px); font-weight: 800; text-align: center; }
+.board .sub { color: var(--muted); text-align: center; font-size: clamp(14px, 2.2vh, 24px); margin-bottom: 2vh; }
+.item { display: flex; align-items: center; gap: 1.2vw; background: var(--navy-2); border-radius: 12px; padding: 1.6vh 1.6vw; }
+.item .pill { flex: none; }
+.item b { font-size: clamp(16px, 2.8vh, 30px); }
+.item span.tec { color: var(--muted); font-size: clamp(13px, 2vh, 22px); margin-left: auto; text-align: right; }
+.start { margin-top: 1vh; display: flex; gap: 14px; }
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
 .confetti i { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 2px; animation: fall linear forwards; }
 @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
@@ -152,7 +133,7 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
   .screen { height: auto; min-height: 100vh; padding: 16px; }
   .opts, .reveal-grid, .rules { grid-template-columns: 1fr; }
   .code pre { font-size: 12px; }
-  .row { grid-template-columns: 2em 7em 1fr 3em; }
+  .item { flex-wrap: wrap; }
 }
 </style>
 </head>
@@ -163,19 +144,17 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
   <div class="center">
     <div><span class="pill">&lt;/&gt; DIAGNÓSTICO RELÂMPAGO</span></div>
     <h1>O Médico do Código</h1>
-    <p class="lead">Vejam o código, diagnostiquem e respondam levantando os dedos. Vale a primeira resposta que o grupo mostrar!</p>
+    <p class="lead">Vejam o código, diagnostiquem o smell e respondam levantando os dedos.</p>
     <div class="rules">
       <div class="rule"><span class="sq" style="background:var(--a)">1</span>1 dedo</div>
       <div class="rule"><span class="sq" style="background:var(--b)">2</span>2 dedos</div>
       <div class="rule"><span class="sq" style="background:var(--c)">3</span>3 dedos</div>
       <div class="rule"><span class="sq" style="background:var(--d)">4</span>4 dedos</div>
     </div>
-    <div class="setup">
-      <label class="field"><span>Quantas duplas/grupos?</span><input id="n-teams" type="number" min="1" max="20" value="6"></label>
+    <div class="start">
       <button class="btn" id="b-start">Começar ▶</button>
-      <button class="btn ghost" id="b-resume" hidden>Continuar partida salva</button>
+      <button class="btn ghost" id="b-resume" hidden>Continuar de onde parou</button>
     </div>
-    <p class="scoring">Cada acerto vale <b>+1</b> · 4 perguntas</p>
   </div>
 </section>
 
@@ -218,22 +197,24 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
       <div class="code"><pre id="r-code"></pre></div>
     </div>
   </div>
-  <div class="teams-bar" id="r-teams"><span class="hint">Quem acertou? (+1)</span></div>
   <div class="actions">
     <button class="btn ghost" id="b-back">◀ Voltar</button>
     <span class="spacer"></span>
-    <span class="keys">Teclas 1–9 marcam grupos · A alterna antes/depois · Espaço avança</span>
+    <span class="keys">A alterna antes/depois · Espaço avança</span>
     <button class="btn" id="b-next">Próxima ▶</button>
   </div>
 </section>
 
-<!-- ======= placar ======= -->
+<!-- ======= resumo final ======= -->
 <section class="screen" id="s-end">
-  <div class="board" id="board"><h1>🏆 Placar final</h1></div>
+  <div class="board" id="board">
+    <h1>🩺 Diagnóstico concluído</h1>
+    <p class="sub">Os smells que encontramos hoje e o tratamento de cada um</p>
+  </div>
   <div class="actions">
     <button class="btn ghost" id="b-review">◀ Voltar à última pergunta</button>
     <span class="spacer"></span>
-    <button class="btn ghost" id="b-reset">Nova partida</button>
+    <button class="btn ghost" id="b-reset">Recomeçar</button>
   </div>
 </section>
 
@@ -340,6 +321,51 @@ public int prazoEntregaDias(TipoFrete tipo, double km) {
   return tipo.prazo(km);
 }
 </script>
+<script type="text/plain" id="c9">
+public class LojaManager {
+  private final List<Produto> produtos = new ArrayList<>();
+  private final List<Contato> clientes = new ArrayList<>();
+  private final List<Venda> pedidos = new ArrayList<>();
+  private final List<String> emailsEnviados = new ArrayList<>();
+
+  // ---------- produtos ----------
+  public void cadastrarProduto(String nome, double preco, int estoque) { ... }
+  public Produto buscarProduto(String nome) { ... }
+  public void repor(String nome, int qtd) { ... }
+  // ---------- clientes ----------
+  public void cadastrarCliente(String nome, String email) { ... }
+  public boolean validarEmail(String email) { ... }
+  // ---------- pedidos ----------
+  public Venda criarPedido(String email, String produto, int qtd) { ... }
+  // ---------- notificacoes ----------
+  public void enviarEmail(String para, String assunto, String corpo) { ... }
+  // ---------- relatorios ----------
+  public double faturamentoTotal() { ... }
+  public String exportarPedidosCsv() { ... }
+}
+</script>
+<script type="text/plain" id="c9d">
+// Cada responsabilidade ganha a sua classe:
+//   CatalogoProdutos -> cadastrar, buscar, repor
+//   CadastroClientes -> cadastrar, buscar
+//   ServicoPedidos   -> criar
+//   Notificador      -> enviar
+//   RelatorioVendas  -> faturamentoTotal, exportarCsv
+
+// LojaManager vira uma fachada fina que só delega:
+public class LojaManager {
+  private final CatalogoProdutos catalogo = new CatalogoProdutos();
+  private final Notificador notificador = new Notificador();
+  private final CadastroClientes clientes = new CadastroClientes(notificador);
+  private final ServicoPedidos pedidos =
+      new ServicoPedidos(catalogo, clientes, notificador);
+
+  public Venda criarPedido(String email, String produto, int qtd) {
+    return pedidos.criar(email, produto, qtd);
+  }
+  // ...
+}
+</script>
 <script type="text/plain" id="c7">
 public String relatorioPorCategoria(List<RegistroVenda> vendas, String categoria) {
   double total = 0;
@@ -387,6 +413,7 @@ const PERGUNTAS = [
     q: "Qual é o smell principal deste código?",
     opts: ["Classe Deus", "Aninhamento profundo", "Números mágicos", "Feature Envy"], right: 1,
     title: "Aninhamento profundo (arrow anti-pattern)",
+    tec: "Cláusulas de guarda",
     why: "5 níveis de <code>if</code>. O caminho feliz fica escondido no meio. A técnica é usar <b>cláusulas de guarda</b>: inverter as condições e sair cedo.",
   },
   {
@@ -394,6 +421,7 @@ const PERGUNTAS = [
     q: "Qual é o smell principal deste código?",
     opts: ["Números mágicos", "Método longo", "Código morto", "Aninhamento profundo"], right: 0,
     title: "Números mágicos",
+    tec: "Constantes nomeadas",
     why: "O que significam 0.2, 3 e 300? A regra de negócio está escondida em literais. Solução: <b>constantes com nome</b> que explicam a regra.",
   },
   {
@@ -401,13 +429,23 @@ const PERGUNTAS = [
     q: "Qual técnica resolve este smell?",
     opts: ["Cláusulas de guarda", "Strategy / Polimorfismo", "Renomear símbolos", "Extract Method"], right: 1,
     title: "Substituir switch por Strategy",
+    tec: "Strategy / Polimorfismo",
     why: "O mesmo <code>switch (tipo)</code> se repete em 3 métodos: um tipo novo obriga a mexer em todos (fere o Open/Closed). Com <b>Strategy</b> (aqui, um <code>enum</code> em que cada tipo implementa seus métodos), cada tipo fica num lugar só.",
+  },
+  {
+    issue: "ISSUE #5", code: "c9", after: "c9d",
+    q: "Qual é o smell principal deste código?",
+    opts: ["Feature Envy", "Código morto", "Números mágicos", "Classe Deus"], right: 3,
+    title: "Classe Deus (God Class)",
+    tec: "Extrair classes por responsabilidade",
+    why: "Uma classe só cuida de produtos, clientes, pedidos, e-mails e relatórios: qualquer mudança no sistema passa por ela. Solução: <b>Extrair Classe</b> por responsabilidade e deixar <code>LojaManager</code> como uma fachada fina que só delega.",
   },
   {
     issue: "ISSUE #6", code: "c7", after: "c7d",
     q: "Qual é o smell principal deste código?",
     opts: ["Aninhamento profundo", "Números mágicos", "Código duplicado", "Classe Deus"], right: 2,
     title: "Código duplicado",
+    tec: "Extract Method + parâmetro",
     why: "Métodos quase idênticos: só o critério do filtro muda. Se o formato da moeda mudar, são 3 lugares para alterar. Solução: <b>Extract Method</b> com o filtro como <b>parâmetro</b> (um <code>Predicate</code>).",
   },
 ];
@@ -415,7 +453,7 @@ const PERGUNTAS = [
 const KEY = "quiz-medico-do-codigo";
 const $ = (id) => document.getElementById(id);
 
-let estado = null; // { times: [nome], i, acertos: {[pergunta]: [idxTimes]} }
+let estado = null; // { i: pergunta atual }
 
 // ---------- persistência leve (sobrevive a um F5 sem querer) ----------
 function salvar() { try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch {} }
@@ -488,7 +526,6 @@ function revelar() {
   $("r-why").innerHTML = p.why;
   verAntes = false;
   desenharCodigoRevelado();
-  desenharTimes();
   mostrar("s-r");
 }
 
@@ -508,59 +545,27 @@ function alternarAntesDepois() {
   desenharCodigoRevelado();
 }
 
-function totalDoTime(t) {
-  return Object.values(estado.acertos).filter((lista) => lista.includes(t)).length;
-}
-
-function desenharTimes() {
-  const bar = $("r-teams");
-  bar.querySelectorAll(".chip").forEach((c) => c.remove());
-  const marcados = estado.acertos[estado.i] || [];
-  estado.times.forEach((nome, t) => {
-    const b = document.createElement("button");
-    b.className = "chip" + (marcados.includes(t) ? " hit" : "");
-    b.innerHTML = `${t < 9 ? `<kbd>${t + 1}</kbd>` : ""}<span></span><span class="pts">${totalDoTime(t)}</span>`;
-    b.querySelector("span").textContent = nome;
-    b.onclick = () => alternarTime(t);
-    bar.appendChild(b);
-  });
-}
-
-function alternarTime(t) {
-  const lista = estado.acertos[estado.i] || (estado.acertos[estado.i] = []);
-  const k = lista.indexOf(t);
-  k >= 0 ? lista.splice(k, 1) : lista.push(t);
-  salvar();
-  desenharTimes();
-}
-
 function proxima() {
   if (estado.i < PERGUNTAS.length - 1) {
     estado.i += 1;
     salvar();
     abrirPergunta();
   } else {
-    placar();
+    resumo();
   }
 }
 
-function placar() {
+function resumo() {
   const board = $("board");
-  board.querySelectorAll(".row").forEach((r) => r.remove());
-  const linhas = estado.times
-    .map((nome, t) => ({ nome, pts: totalDoTime(t) }))
-    .sort((a, b) => b.pts - a.pts);
-  const max = Math.max(1, ...linhas.map((l) => l.pts));
-  linhas.forEach((l, k) => {
-    const pos = k === 0 || l.pts !== linhas[k - 1].pts ? k + 1 : null;
-    const row = document.createElement("div");
-    row.className = "row" + (l.pts === linhas[0].pts && l.pts > 0 ? " p1" : "");
-    row.innerHTML = `<span class="pos">${pos ? pos + "º" : ""}</span><span class="nm"></span><div class="bar"></div><span class="val">${l.pts}</span>`;
-    row.querySelector(".nm").textContent = l.nome;
-    board.appendChild(row);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      row.querySelector(".bar").style.width = `${(l.pts / max) * 100}%`;
-    }));
+  board.querySelectorAll(".item").forEach((r) => r.remove());
+  PERGUNTAS.forEach((p) => {
+    const item = document.createElement("div");
+    item.className = "item";
+    item.innerHTML = `<span class="pill"></span><b></b><span class="tec"></span>`;
+    item.querySelector(".pill").textContent = p.issue;
+    item.querySelector("b").textContent = p.title;
+    item.querySelector(".tec").textContent = p.tec;
+    board.appendChild(item);
   });
   mostrar("s-end");
   confete();
@@ -584,12 +589,7 @@ function confete() {
 
 // ---------- início ----------
 function comecar() {
-  const n = Math.min(20, Math.max(1, parseInt($("n-teams").value, 10) || 6));
-  estado = {
-    times: Array.from({ length: n }, (_, k) => `Grupo ${k + 1}`),
-    i: 0,
-    acertos: {},
-  };
+  estado = { i: 0 };
   salvar();
   abrirPergunta();
 }
@@ -608,7 +608,7 @@ $("b-review").onclick = () => { $("confetti").innerHTML = ""; revelar(); };
 $("b-reset").onclick = () => { limpar(); estado = null; $("b-resume").hidden = true; mostrar("s-intro"); };
 
 const salvo = carregar();
-if (salvo && Array.isArray(salvo.times) && salvo.i < PERGUNTAS.length) $("b-resume").hidden = false;
+if (salvo && !salvo.times && salvo.i > 0 && salvo.i < PERGUNTAS.length) $("b-resume").hidden = false;
 
 document.addEventListener("keydown", (e) => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
@@ -617,7 +617,6 @@ document.addEventListener("keydown", (e) => {
     if (e.key === " " || e.key === "Enter") { e.preventDefault(); revelar(); }
   } else if (tela === "s-r") {
     if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") { e.preventDefault(); proxima(); }
-    if (/^[1-9]$/.test(e.key) && +e.key <= estado.times.length) alternarTime(+e.key - 1);
     if (e.key.toLowerCase() === "a") alternarAntesDepois();
   }
 });
