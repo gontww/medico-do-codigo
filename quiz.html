@@ -221,6 +221,53 @@ h1.q { font-size: clamp(22px, 4.2vh, 46px); font-weight: 800; letter-spacing: -.
 <div class="confetti" id="confetti"></div>
 
 <!-- ======= trechos de código (texto puro) ======= -->
+<script type="text/plain" id="c0">
+public String gerarFatura(Pedido p) {
+  List<String> linhas = new ArrayList<>();
+  double t = 0, d = 0;
+  // ... monta o cabeçalho (4 linhas)
+  // itens
+  for (int i = 0; i < p.itens().size(); i++) {
+    Item x = p.itens().get(i);
+    double s = x.preco() * x.qtd();
+    linhas.add(x.nome() + " x" + x.qtd() + " = R$ " + String.format("%.2f", s));
+    t += s;
+  }
+  // cupom
+  if (p.cupom() != null) {
+    if (p.cupom().tipo().equals("PERCENTUAL")) d = t * (p.cupom().valor() / 100);
+    else d = p.cupom().valor();
+    if (d > t) d = t;
+  }
+  // rodape
+  // ... mais 7 linhas montando subtotal, desconto e total
+  return String.join("\n", linhas);
+}
+</script>
+<script type="text/plain" id="c0d">
+public String gerarFatura(Pedido pedido) {
+  double subtotal = calcularSubtotal(pedido.itens());
+  double desconto = calcularDesconto(pedido.cupom(), subtotal);
+  List<String> linhas = new ArrayList<>();
+  linhas.addAll(montarCabecalho(pedido));
+  linhas.addAll(montarItens(pedido.itens()));
+  linhas.addAll(montarRodape(subtotal, desconto));
+  return String.join("\n", linhas);
+}
+
+private double calcularSubtotal(List<Item> itens) {
+  return itens.stream().mapToDouble(i -> i.preco() * i.qtd()).sum();
+}
+
+private double calcularDesconto(Cupom cupom, double subtotal) {
+  if (cupom == null) return 0;
+  double desconto = cupom.tipo().equals("PERCENTUAL")
+      ? subtotal * (cupom.valor() / 100)
+      : cupom.valor();
+  return Math.min(desconto, subtotal);
+}
+// + montarCabecalho, montarItens, montarRodape
+</script>
 <script type="text/plain" id="c1">
 public ResultadoPagamento processarPagamento(Usuario usuario, double valor, String metodo) {
   if (usuario != null) {
@@ -408,6 +455,14 @@ public String relatorioPorVendedor(List<RegistroVenda> vendas, String vendedor) 
 
 <script>
 const PERGUNTAS = [
+  {
+    issue: "ISSUE #1", code: "c0", after: "c0d",
+    q: "Qual é o smell principal deste código?",
+    opts: ["Classe Deus", "Código morto", "Método longo", "Feature Envy"], right: 2,
+    title: "Método longo",
+    tec: "Extract Method",
+    why: "Um método só monta o cabeçalho, lista os itens, calcula o subtotal, aplica o cupom e monta o rodapé. Os comentários <code>// itens</code>, <code>// cupom</code> e <code>// rodape</code> já dizem onde cortar. Solução: <b>Extract Method</b>, até <code>gerarFatura</code> ler como um índice.",
+  },
   {
     issue: "ISSUE #2", code: "c1", after: "c1d",
     q: "Qual é o smell principal deste código?",
