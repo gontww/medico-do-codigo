@@ -6,48 +6,44 @@ Este repositório é o "paciente": um pedaço de sistema de loja virtual que **f
 
 > "Um processo de alteração em um sistema de software para melhorar sua estrutura interna sem mudar seu comportamento externo." (Martin Fowler)
 
+## 🎯 Quiz: Diagnóstico Relâmpago
+
+Quiz rápido para identificar os smells, em grupo: **https://www.gont.com.br/quiz-medico-do-codigo/**
+
 ## Como participar
 
-1. **Escolham uma issue** na aba *Issues* e comentem `Grupo X pegou esta` para ninguém repetir.
-2. **Façam um fork** (ou criem uma branch `grupo-x/issue-N`, se tiverem acesso).
-3. **Rodem os testes antes de mexer em qualquer coisa:**
+Não precisa instalar nada nem criar conta. Tudo roda no navegador.
+
+1. **Peguem uma issue** na aba *Issues* e avisem o facilitador qual o grupo pegou, para ninguém repetir.
+2. **Abram o projeto no StackBlitz** (veja abaixo).
+3. **Rodem os testes antes de mexer em qualquer coisa** com `npm test`.
+4. **Refatorem em passos pequenos**, rodando `npm test` a cada passo.
+5. **Apresentem para a turma** direto da tela do StackBlitz.
+
+## Editando pelo navegador com o StackBlitz
+
+O StackBlitz é um VS Code que roda no navegador, com terminal e Node.js já prontos. **Não precisa de login.**
+
+[![Abrir no StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/gontww/medico-do-codigo)
+
+1. Cliquem no botão acima ou abram **https://stackblitz.com/github/gontww/medico-do-codigo**.
+2. Esperem alguns segundos enquanto o projeto carrega.
+3. Os arquivos ficam na barra lateral esquerda, em `src/`. Abram o arquivo da issue de vocês e editem normalmente.
+4. No **terminal** na parte de baixo da tela, rodem:
    ```bash
    npm test
    ```
-   Precisa só de Node.js 18+. Não há dependências para instalar.
-4. **Refatorem em passos pequenos**, rodando `npm test` e fazendo commit a cada passo verde.
-5. **Abram um Pull Request** usando o template e apresentem para a turma.
+   Os testes devem continuar passando a cada passo da refatoração.
 
-## Editando pelo navegador (sem instalar nada)
+> ⚠️ **Não fechem nem recarreguem a aba.** Sem login, o trabalho fica só nela. Para guardar uma cópia, usem o menu do projeto e baixem em ZIP (**Download project**).
 
-O GitHub tem um VS Code que roda direto no navegador. Precisa só estar logado na sua conta do GitHub.
+### Opcional: enviar como Pull Request
 
-### Opção 1: github.dev (editar e commitar)
-
-1. Na página deste repositório, aperte a tecla **`.`** (ponto). Também dá para trocar `github.com` por `github.dev` na barra de endereço.
-2. O VS Code abre no navegador. Os arquivos ficam na barra lateral esquerda, em `src/`.
-3. Editem o código normalmente.
-4. Para salvar, abram a aba **Source Control** (ícone de ramificação na barra lateral ou `Ctrl+Shift+G`), escrevam a mensagem e cliquem em **Commit & Push**.
-5. Como vocês não têm permissão de escrita aqui, o editor vai oferecer **criar um fork**. Aceitem: o commit vai para o fork de vocês.
-6. Voltem ao fork no GitHub e cliquem em **Contribute → Open pull request**.
-
-> ⚠️ O github.dev **não tem terminal**, então não dá para rodar `npm test` nele. Mas não tem problema: ao abrir o Pull Request, o GitHub roda os testes sozinho e mostra ✅ ou ❌ no PR. Se quiserem rodar antes, usem a opção 2.
-
-### Opção 2: Codespaces (editor + terminal para rodar os testes)
-
-1. Se ainda não têm um fork, cliquem em **Fork** no topo desta página. Depois, no fork de vocês, cliquem em **Code → Codespaces → Create codespace on main**.
-2. Em ~1 minuto abre um VS Code completo no navegador, com terminal e Node.js já instalados.
-3. No terminal (`Ctrl+'`), rodem:
-   ```bash
-   npm test
-   ```
-4. Commitem pela aba **Source Control**, igual à opção 1.
-
-> Contas pessoais do GitHub têm horas gratuitas de Codespaces por mês, o que sobra para a dinâmica. Ao terminar, apaguem o codespace em [github.com/codespaces](https://github.com/codespaces).
+Quem quiser deixar a solução registrada pode fazer depois, com a própria conta do GitHub: fork, commit e Pull Request usando o template. O GitHub roda os testes sozinho e mostra ✅ ou ❌ no PR.
 
 ## Regras do jogo
 
-- 🟢 Os testes são a rede de segurança: **eles devem continuar passando**. Se precisarem alterar um teste, justifiquem no PR.
+- 🟢 Os testes são a rede de segurança: **eles devem continuar passando**. Se precisarem alterar um teste, justifiquem na apresentação.
 - 🕵️ Cada issue descreve **um** smell. Mas cada arquivo esconde **pelo menos mais um**, que não foi especificado. Encontrem!
 - 🚫 Não misturem feature nova com refatoração.
 - 🧹 Regra do escoteiro: deixem o código melhor do que encontraram.
